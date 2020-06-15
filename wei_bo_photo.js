@@ -1,7 +1,7 @@
 const request = require('request-promise')
 const fs = require('fs')
 
-var cookie = '_T_WM=16413697197; WEIBOCN_FROM=1110003030; MLOGIN=1; ALF=1594701105; SCF=Av9bmaqRBaNUVUMhQEi_9DrUXYLTsdI_9Svs9mBc-4lO0AIECzmkTJaItoWLPJIod8sN0H3BiJFiCGfiF9vZPOc.; SUB=_2A25z4dhjDeRhGeVG4lUY9izIyziIHXVRLfgrrDV6PUJbktANLVfXkW1NT2tQ4Yt6M3VD7NyhUAiOyPFewHgmGPpN; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WhaYo8bc97dDM.scgjf.s5y5JpX5K-hUgL.FoeR1KM4SozXehB2dJLoIXnLxKqL1hnL1K2LxK-LB--LBoqLxKqL1-eL1h.LxK-L12qLB-2LxK-L1h-L1KBLxK-LB--L1-BLxK-LB--L1-BLxKBLBonLBoqt; SUHB=0nluXpBI0t9Bx9; SSOLoginState=1592109107; XSRF-TOKEN=235499; M_WEIBOCN_PARAMS=luicode%3D10000011%26lfid%3D1078031195242865';
+var cookie = 'XXX';
 
 // 获取所有人物链接数组（包含姓名 链接 图片总数）
 var result = [];
@@ -19,17 +19,19 @@ const start = async () => {
         // 过滤数组只保留列表数据
         const currentNameData = responseData.data.cards.filter( x => x.card_type === 11)[0].card_group;
         // 得到与关键字匹配的数据(跳转链接及名称)
-        const getCurrentNameFirst = currentNameData[0];
-        getParams(getCurrentNameFirst.user.profile_url)
-        // 根据跳转链接获取图片总数
-        const responseImg = await request({
-            url: 'https://m.weibo.cn/api/container/getIndex',
-            qs: {uid: params.uid, t: 0, luicode: params.luicode, lfid: params.lfid, containerid: `107803${params.uid}`},
-            json:true
-        });
-        let imgTotal = responseImg.data.cards[0].title.match(/\(([^)]*)\)/)[1]
-        console.log(getCurrentNameFirst.user.screen_name,getCurrentNameFirst.user.profile_url,imgTotal)
-        result.push({profile_url:getCurrentNameFirst.user.profile_url,screen_name:getCurrentNameFirst.user.screen_name,img_total:imgTotal})
+        if (currentNameData && currentNameData.length > 0) {
+            const getCurrentNameFirst = currentNameData[0];
+            getParams(getCurrentNameFirst.user.profile_url)
+            // 根据跳转链接获取图片总数
+            const responseImg = await request({
+                url: 'https://m.weibo.cn/api/container/getIndex',
+                qs: {uid: params.uid, t: 0, luicode: params.luicode, lfid: params.lfid, containerid: `107803${params.uid}`},
+                json:true
+            });
+            let imgTotal = responseImg.data.cards[0].title.match(/\(([^)]*)\)/)[1]
+            console.log(getCurrentNameFirst.user.screen_name,getCurrentNameFirst.user.profile_url,imgTotal)
+            result.push({profile_url:getCurrentNameFirst.user.profile_url,screen_name:getCurrentNameFirst.user.screen_name,img_total:imgTotal})
+        }
     }
     for (let n = 0; n < result.length; n++) {
         const getPage = Math.ceil(Number(result[n].img_total)/24)
