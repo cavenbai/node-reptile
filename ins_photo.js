@@ -19,12 +19,12 @@ const start = async (name) => {
             x.node.edge_sidecar_to_children.edges.forEach( m => { urls.push(m.node.display_url) })
         } else urls.push(x.node.display_url)
     })
-    console.log(`开始下载${name}第${page}页数据`)
+    console.log(`<---------------------------------开始下载${name}第${page}页数据--------------------------------->`)
     for (let e of urls) {let r = await down(e,name);console.log(r)}
     if (responsData.page_info.has_next_page) {
         variablesParams.after = responsData.page_info.end_cursor      
         page++;
-        start(name)
+        await start(name).then()
     } else {
         page = 1
         return
@@ -75,6 +75,51 @@ async function startUp () {
     }
 }
 
-const characterName = ['xiaomi.usa','kaven'];
-
+const characterName = [ 
+    'odriver6666',
+    'bijo_labo',
+    'ulzzanggirltown',
+    'joannalin724',
+    'silveryiyi_m',
+    'onefm881',
+    '_imyour_joy',
+    'shirahoshi.natsumi',
+    'bijo_labo',
+    'kingjames',
+    'mika780611',
+    'coffee89921',
+    'cescf4bregas',
+    'shasha_soosoo_' 
+];
+// 爬取人名 
+// const popularName = async () => {
+//    const d = await request({url:'https://www.instagram.com/explore/grid',qs:{
+//     'is_prefetch': false,
+//     'omit_cover_media': false,
+//     'module': 'explore_popular',
+//     'use_sectional_payload': true,
+//     'cluster_id': 'explore_all:0',
+//     'include_fixed_destinations': true,
+//     'max_id': 0
+//    },headers:header,json:true})
+//    d.sectional_items.forEach( x => {
+//        if (x.feed_type === 'channel') {
+//             x.layout_content.fill_items.forEach(n => {
+//                 characterName.push(n.media.caption.user.username)
+//             })
+//             characterName.push( x.layout_content.two_by_two_item.channel.media.caption.user.username)
+//        } else if (x.feed_type === 'media') {
+//             x.layout_content.medias && x.layout_content.medias.forEach(k => {
+//                 characterName.push(k.media.caption.user.username)
+//             })
+//             x.layout_content.fill_items && x.layout_content.fill_items.forEach(n => {
+//                 characterName.push(n.media.user.username)
+//             })
+//             x.layout_content.two_by_two_item && characterName.push( x.layout_content.two_by_two_item.media.caption.user.username)
+//             x.layout_content.one_by_two_item && characterName.push( x.layout_content.one_by_two_item.stories.seed_reel.user.username)
+//        }
+//    })
+//    console.log(characterName)
+// }
+// popularName()
 startUp().then();
