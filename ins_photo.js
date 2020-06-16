@@ -2,7 +2,7 @@ const request = require('request-promise')
 const cheerio = require("cheerio")
 const fs = require('fs')
 var cookie = 'xxx';
-var proxy = 'xxx'
+var proxy = 'http://127.0.0.1:1080/pac?auth=S3rQWsbKhxZuIFvYyWzr&t=202006162135580784'
 var header = {'cookie':cookie,'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36'}
 var variablesParams = {"id":"","first":12,"after":""}
 var option = {query_hash: 'eddbde960fed6bde675388aac39a3657',variables: ''}
@@ -10,7 +10,7 @@ var page = 1 // 页数统计
 const start = async (name) => {
     if (page === 1) { await homeData(name)}
     option.variables = JSON.stringify(variablesParams)
-    const responseData = await request({ url: 'https://www.instagram.com/graphql/query/',qs: option,header: header,json:true});
+    const responseData = await request({ url: 'https://www.instagram.com/graphql/query/',qs: option,proxy:proxy,header: header,json:true});
     const responsData = responseData.data.user.edge_owner_to_timeline_media
     const urls = []
     responsData && responsData.edges.forEach( x => {
@@ -33,7 +33,7 @@ const start = async (name) => {
 
 const homeData = async (name) => {
     // 获取首页数据及ajax参数
-    const responseFirstData = await request.get(`https://www.instagram.com/${name}`,{headers:header}) 
+    const responseFirstData = await request.get(`https://www.instagram.com/${name}`,{headers:header,proxy:proxy,})
     const $ = cheerio.load(responseFirstData)
     $('script').each(function(indexInArray) {    
         if ($('script').eq(indexInArray).html().indexOf("window._sharedData") == 0) {    
@@ -61,7 +61,7 @@ const creatFile = async (screen_name) => {
 const down = async (m,name) => {
     await creatFile(name)
     return new Promise((resolve,reject) => {
-        request({url:m,headers:header}).pipe(fs.createWriteStream(`./${name}/${(new Date()).valueOf()}.${m.split('?')[0].split('.').pop()}`,{ 'enconding':'binary'})
+        request({url:m,headers:header,proxy:proxy}).pipe(fs.createWriteStream(`./${name}/${(new Date()).valueOf()}.${m.split('?')[0].split('.').pop()}`,{ 'enconding':'binary'})
             .on("error", (e) => {reject('下载失败:' + e)})
             .on("finish", () => {resolve("下载成功" + m);})
             .on("close", () => {})
@@ -75,21 +75,19 @@ async function startUp () {
     }
 }
 
-const characterName = [ 
+const characterName = [
     'odriver6666',
     'bijo_labo',
     'ulzzanggirltown',
     'joannalin724',
     'silveryiyi_m',
     'onefm881',
-    '_imyour_joy',
     'shirahoshi.natsumi',
     'bijo_labo',
     'kingjames',
     'mika780611',
     'coffee89921',
-    'cescf4bregas',
-    'shasha_soosoo_' 
+    'shasha_soosoo_'
 ];
 // 爬取人名 
 // const popularName = async () => {
